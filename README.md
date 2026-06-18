@@ -1,0 +1,1 @@
+# Scala-Anomaly-Detector\n\n## Overview\nEnterprise-grade anomaly detector implementation in Scala.\n\n## Quick Start (1-Click Build)\n\n```bash\ngit clone https://github.com/skylerblue333/Scala-Anomaly-Detector.git\ncd Scala-Anomaly-Detector\n# Build instructions depend on the language\n```\n
