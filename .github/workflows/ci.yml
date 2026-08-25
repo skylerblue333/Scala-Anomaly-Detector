@@ -14,7 +14,13 @@ jobs:
           distribution: temurin
           java-version: '21'
       - uses: sbt/setup-sbt@v1
-      - name: Compile
-        run: sbt -v compile
-      - name: Test
-        run: sbt -v test
+      - name: Compile and test
+        run: sbt -batch clean compile test
+      - name: CLI smoke
+        run: sbt -batch 'run latency 130 100 20' | grep 'anomalous=true'
+      - name: Build image
+        run: docker build -t sky-anomaly:ci .
+      - name: Verify non-root image
+        run: test "$(docker image inspect sky-anomaly:ci --format '{{.Config.User}}')" = "10001"
+      - name: Container smoke
+        run: docker run --rm sky-anomaly:ci latency 110 100 20 | grep 'anomalous=false'
