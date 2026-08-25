@@ -12,10 +12,11 @@ COPY build.sbt ./
 COPY project ./project
 RUN sbt -batch update
 COPY src ./src
-RUN sbt -batch compile test
+RUN sbt -batch compile test \
+    && mkdir -p /app/runtime-classes \
+    && cp -R target/scala-3.3.3/classes/. /app/runtime-classes/
 RUN useradd --system --uid 10001 --create-home appuser \
     && chown -R appuser:appuser /app /home/appuser
-ENV HOME=/home/appuser \
-    SBT_OPTS="-Dsbt.server.autostart=false -Dsbt.ci=true -Dsbt.boot.lock=false"
+ENV HOME=/home/appuser
 USER 10001
-ENTRYPOINT ["sbt", "-batch", "run"]
+ENTRYPOINT ["java", "-cp", "/app/runtime-classes", "com.skycoin4444.anomaly.Main"]
