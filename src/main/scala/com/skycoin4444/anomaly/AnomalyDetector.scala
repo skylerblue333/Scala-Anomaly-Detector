@@ -21,7 +21,7 @@ object AnomalyDetector:
 
   def detectBatch(observations: Seq[Observation]): Either[String, BatchDetection] =
     if observations.isEmpty then Left("batch must contain at least one observation")
-    else if observations.size > MaxBatchSize then Left(s"batch must contain at most $MaxBatchSize observations")
+    else if observations.lengthCompare(MaxBatchSize) > 0 then Left(s"batch must contain at most $MaxBatchSize observations")
     else
       observations.foldLeft[Either[String, Vector[Detection]]](Right(Vector.empty)) {
         case (Right(acc), observation) => detect(observation).map(acc :+ _)
