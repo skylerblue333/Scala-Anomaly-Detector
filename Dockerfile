@@ -13,10 +13,11 @@ COPY project ./project
 RUN sbt -batch update
 COPY src ./src
 RUN sbt -batch compile test \
-    && mkdir -p /app/runtime-classes \
-    && cp -R target/scala-3.3.3/classes/. /app/runtime-classes/
+    && mkdir -p /app/runtime-classes /app/runtime-libs \
+    && cp -R target/scala-3.3.3/classes/. /app/runtime-classes/ \
+    && find /root/.cache/coursier -type f \( -name 'scala3-library_3-*.jar' -o -name 'scala-library-*.jar' \) -exec cp {} /app/runtime-libs/ \;
 RUN useradd --system --uid 10001 --create-home appuser \
     && chown -R appuser:appuser /app /home/appuser
 ENV HOME=/home/appuser
 USER 10001
-ENTRYPOINT ["java", "-cp", "/app/runtime-classes", "com.skycoin4444.anomaly.Main"]
+ENTRYPOINT ["java", "-cp", "/app/runtime-classes:/app/runtime-libs/*", "com.skycoin4444.anomaly.Main"]
