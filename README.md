@@ -1,44 +1,55 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# Sky Anomaly Detector
 
-## Project profile and code-audit snapshot
+A small Scala 3 engineering-beta library and CLI for deterministic threshold-based anomaly checks.
 
-**What this is:** **Scala-Anomaly-Detector** is a public repository described as: “Enterprise-grade anomaly detector implementation in Scala. #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **Python (4 files)**.
+## What it does
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **18 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+Each observation contains a metric name, value, baseline, and positive tolerance. The detector computes absolute deviation and a normalized score (`deviation / tolerance`). Scores greater than `1.0` are marked anomalous; a score exactly equal to `1.0` is not.
 
-**Implementation evidence:** 2 test-related file(s) detected; 2 dependency or package manifest(s) detected; 2 build/CI/infrastructure signal(s) detected; and 3 documentation or governance file(s) detected. Test filenames observed include `tests/__init__.py`, `tests/test_main.py`. Dependency or package files include `package.json`, `requirements.txt`. Build, CI, or infrastructure signals include `Dockerfile`, `.github/workflows/ci.yml`.
+The implementation validates finite numeric inputs, trims and bounds metric names to 128 characters, and supports bounded batches of up to 10,000 observations.
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+## Run locally
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+Requirements: JDK 21 and sbt.
 
-**Quality and security note:** No obvious secret-like pattern was detected by the limited static scan; this is not a substitute for a security audit. No TODO/FIXME marker was detected in the scanned text files.
+```bash
+sbt -batch test
+sbt -batch 'run latency 130 100 20'
+```
 
----
+Example output:
 
-# Scala Anomaly Detector
+```text
+metric=latency anomalous=true deviation=30.0 score=1.5
+```
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/Scala-Anomaly-Detector?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/Scala-Anomaly-Detector?style=flat-square)
+## Container
 
-## 🌟 Overview
-**Scala-Anomaly-Detector** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **Python**.
+```bash
+docker build -t sky-anomaly .
+docker run --rm sky-anomaly latency 110 100 20
+```
 
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
+The image runs as UID `10001`. The container intentionally carries the Scala build runtime; this repository favors transparent reproducibility over claiming a minimized production image.
 
-## 🛠️ Technology Stack
-- **Primary Domain**: Python
-- **Ecosystem**: SkyCoin4444 Digital Platform
+## CI gate
 
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
+Pull requests and pushes compile and test the Scala code, exercise the CLI, build the image, verify non-root execution configuration, and run a container smoke check.
 
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
+## Product boundary
 
----
-*Powered by SkyCoin4444*
+Status: **engineering beta**.
+
+This is a deterministic threshold detector, not a trained machine-learning anomaly model, streaming analytics platform, forecasting service, alerting system, persistent metrics database, or production monitoring deployment. Threshold selection and operational meaning remain the caller's responsibility.
+
+## SKYCOIN4444 integration
+
+The detector can be consumed as a JVM library or wrapped behind a stable adapter for metrics/analytics components. Keep policy configuration outside this library so the standalone product remains reusable.
+
+## Security
+
+The core performs no network access and executes no caller-supplied code. Treat untrusted metric data as untrusted input at any surrounding API boundary. See `SECURITY.md` for reporting guidance.
+
+## License
+
+See `LICENSE`.
