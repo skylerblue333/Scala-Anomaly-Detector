@@ -16,6 +16,6 @@ RUN sbt -batch compile test
 RUN useradd --system --uid 10001 --create-home appuser \
     && chown -R appuser:appuser /app /home/appuser
 ENV HOME=/home/appuser \
-    SBT_OPTS="-Dsbt.server.autostart=false -Dsbt.ci=true"
+    SBT_OPTS="-Dsbt.server.autostart=false -Dsbt.ci=true -Dsbt.boot.lock=false"
 USER 10001
 ENTRYPOINT ["sbt", "-batch", "run"]
