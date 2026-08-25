@@ -15,7 +15,10 @@ COPY src ./src
 RUN sbt -batch compile test \
     && mkdir -p /app/runtime-classes /app/runtime-libs \
     && cp -R target/scala-3.3.3/classes/. /app/runtime-classes/ \
-    && find /root/.cache/coursier -type f \( -name 'scala3-library_3-*.jar' -o -name 'scala-library-*.jar' \) -exec cp {} /app/runtime-libs/ \;
+    && find /root/.cache/coursier -type f -path '*/org/scala-lang/scala3-library_3/3.3.3/scala3-library_3-3.3.3.jar' -exec cp {} /app/runtime-libs/ \; \
+    && find /root/.cache/coursier -type f -path '*/org/scala-lang/scala-library/2.13.12/scala-library-2.13.12.jar' -exec cp {} /app/runtime-libs/ \; \
+    && test -f /app/runtime-libs/scala3-library_3-3.3.3.jar \
+    && test -f /app/runtime-libs/scala-library-2.13.12.jar
 RUN useradd --system --uid 10001 --create-home appuser \
     && chown -R appuser:appuser /app /home/appuser
 ENV HOME=/home/appuser
